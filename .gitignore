@@ -1,0 +1,12 @@
+# This repository distributes the Qifu list-page skill only.
+*
+
+!.gitignore
+!README.md
+!AGENTS.md
+!skills/
+skills/*
+!skills/qifu-list-page/
+!skills/qifu-list-page/**
+
+**/.DS_Store
