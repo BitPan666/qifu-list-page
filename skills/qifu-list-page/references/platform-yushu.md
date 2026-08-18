@@ -122,7 +122,7 @@ sidePath[]      从一级菜单到当前页面的完整路径
 使用真实 `Navigation / SideMenu / SideMenuItem-V2` 实例逐项组装，不创建固定业务大组件：
 
 1. 宽度固定为 200px；一级菜单高 44px，二、三级菜单高 40px。
-2. 每个实例通过 `Label`、`Level`、`Has Submenu`、`State` 设置内容。
+2. 每个实例按 `component-invocation-contract.md` 动态解析 `Label`、`Level`、`Has Submenu`、`State` 的真实 Key，写入后立即回读；不得假设展示名称就是完整可写 Key。
 3. 一级菜单将 `showIcon 显示图标` 设为 `true`，通过 `icon 图标` INSTANCE_SWAP 选择本文件映射的 16×16 本地图标；不得覆盖嵌套节点或绘制替代图标。
 4. 二、三级菜单保持纯文本层级，不显示业务图标；`Has Submenu=True` 时仅保留组件自带的展开箭头。
 5. `sideActive` 是唯一的当前页菜单并使用 `State=Selected`；如果它是无子菜单叶子，则显示绿色选中背景与右侧指示条。
@@ -132,6 +132,7 @@ sidePath[]      从一级菜单到当前页面的完整路径
 9. 菜单区域使用垂直 Auto Layout。侧栏整体填满 Header 以下高度；菜单滚动区 `layoutGrow=1`、裁切内容并允许纵向滚动。
 10. 底部固定保留 `collapse-button`：使用 200×40px 横向 Auto Layout 容器，顶部 1px 分割线，左内边距 20px；内部 `Icon/shouqi` 使用组件节点 `2423:450`，固定为 16×16px、垂直居中且 `layoutSizingHorizontal=FIXED`。只有底部容器横向填充侧栏，图标实例不得设为 `FILL` 或直接 resize 到侧栏宽度；其中心线应与上方一级菜单图标一致。滚动只作用于菜单区域，不让收起按钮随菜单滚走。
 11. 静态画板需要展示完整菜单时允许增加画板高度；不得压缩菜单项高度，也不得让菜单覆盖底部收起按钮。
+12. Label、图标或状态写入失败时停止，不创建 `Navigation Text Overlay`、裸文字或替代图标。所有一级菜单图标不得保持同一个默认 INSTANCE_SWAP。
 
 ## 6. 输入解析示例
 

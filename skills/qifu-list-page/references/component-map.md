@@ -3,22 +3,29 @@
 ## 目录
 
 - [来源](#1-来源)
-- [页面骨架与导航](#2-页面骨架与导航)
-- [筛选与动作](#3-筛选与动作)
-- [表格、状态与分页](#4-表格状态与分页)
+- [调用边界](#2-调用边界)
+- [页面骨架与导航](#3-页面骨架与导航)
+- [筛选与动作](#4-筛选与动作)
+- [表格、状态与分页](#5-表格状态与分页)
 - [Table Shell V2 Slot 替换后的逐层同步](#table-shell-v2-slot-替换后的逐层同步强制)
-- [已确认缺口](#5-已确认缺口)
-- [运行时缺口记录格式](#6-运行时缺口记录格式)
+- [已确认缺口](#6-已确认缺口)
+- [运行时缺口记录格式](#7-运行时缺口记录格式)
 
 ## 1. 来源
 
 - 组件库文件：`奇富科技中后台组件库 新`
 - 文件 Key：`gTV3VdC6a5e9vpkRHIZSXA`
-- 本映射盘点日期：2026-07-29
+- 本映射盘点日期：2026-08-18
 
 节点 ID 用于同文件创建实例；发布 Key 用于其他文件导入。若节点已重建，按精确组件集名称重新发现，并更新本映射。
 
-## 2. 页面骨架与导航
+## 2. 调用边界
+
+本文件回答“选择哪个组件”。真实属性 Key、属性类型、INSTANCE_SWAP、Slot 写入顺序和回读规则以 [组件调用契约](component-invocation-contract.md) 为准；交付门禁以 [页面结构化验收契约](structural-validation.md) 为准。
+
+表格中的属性名是稳定逻辑名称，不保证等于 Figma 运行时返回的完整 Key。创建实例后必须读取 `componentProperties` 动态解析；禁止把 `Label#2405:0` 等当前内部后缀固化为长期接口。
+
+## 3. 页面骨架与导航
 
 | 用途 | 组件集 | 节点 ID | 发布 Key | 关键属性 |
 | --- | --- | --- | --- | --- |
@@ -33,9 +40,9 @@
 | 选项卡项 | `Navigation / Tabs / TabItem` | `2695:3345` | `a314f0d8db2719a4bfb79ca6e594d8cd3101df40` | `type=line/card/pill`、`size`、`state` |
 | 普通列表内容外壳 V2 | `Templates / List Page Shell-V2` | `3478:657` | `6e26dad1245c1a7445593586454d6b2c73ff5433` | `pageHeaderSlot`、`filterBarSlot`、`tableSlot`、`showPageHeader`、`showFilterBar`；三个 Slot 使用内容高度 |
 
-本文件只记录组件解析与实现限制。页面结构和 List Action Bar 组合方式以 `page-rules.md` 为准；毓数菜单语义以 `platform-yushu.md` 为准。需要自定义业务文案时先检查实例是否暴露文本属性，未暴露时记录组件缺口。
+本文件只记录组件解析与实现限制。页面结构和 List Action Bar 组合方式以 `page-rules.md` 为准；毓数菜单语义以 `platform-yushu.md` 为准。需要自定义业务文案时按调用契约动态解析文本属性：契约声明存在但当前写入失败属于执行失败；只有核对母版后确认未暴露该能力，才记录组件缺口。
 
-## 3. 筛选与动作
+## 4. 筛选与动作
 
 | 用途 | 组件集 | 节点 ID | 发布 Key | 关键属性 |
 | --- | --- | --- | --- | --- |
@@ -74,7 +81,7 @@
 
 Input V2 的 `M 默认尺寸` 已是原生 32px：16px 图标垂直居中于 y=8，20px 文本垂直居中于 y=6。生成后仍需检查 Filter Bar 的 Row 与 Slot 同为 32px、垂直居中且不裁切，但不再对 Input 实例做额外高度覆盖。
 
-## 4. 表格、状态与分页
+## 5. 表格、状态与分页
 
 | 用途 | 组件集 | 节点 ID | 发布 Key | 关键属性 |
 | --- | --- | --- | --- | --- |
@@ -123,7 +130,7 @@ Table Shell-V2 的 `size`、`type`、`selection` 只决定母版默认 Slot 内�
 6. 自定义行数与母版默认行数不一致时，变体切换会把 Table Shell 实例恢复为母版固定高度，但自定义 `rowsSlot` 仍保留真实内容高度，造成后续行与分页被外壳裁切。计算 `requiredTableHeight = headerSlot.height + rowsSlot.height + paginationSlot.height`，显式调整 Table Shell 实例高度，并确认外层 `tableSlot` 和 List Page Shell 随内容重新包裹。
 7. 最后按节点类型统计并抽查属性：表头数等于列数，Row 数等于数据行数，每行 Content Cell 数等于业务列数，Selection Cell 数只允许为 0 或“数据行数 + 1”；同时检查 `paginationSlot.y + paginationSlot.height <= Table Shell.height`。
 
-## 5. 已确认缺口
+## 6. 已确认缺口
 
 ### P0：直接影响普通列表页自动生成
 
@@ -159,7 +166,7 @@ Table Shell-V2 的 `size`、`type`、`selection` 只决定母版默认 Slot 内�
    - 剩余限制：V2 默认展示第一页；当提示词明确要求当前页大于 1 时，仍不会自动重算选中位置、相邻页窗口和首末箭头状态。
    - 当前处理：普通列表默认首屏不记录缺口；只有明确生成非首页状态时，才使用页面级受控分页并记录缺口。
 
-## 6. 运行时缺口记录格式
+## 7. 运行时缺口记录格式
 
 在页面右侧的 `Audit / Missing Components` 使用：
 

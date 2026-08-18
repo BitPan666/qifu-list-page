@@ -13,6 +13,10 @@ description: Use when creating, updating, or auditing standard Qifu desktop list
 
 - [通用页面规则](references/page-rules.md)：页面组合、布局、筛选、操作栏、表格、状态与验收规则。
 - [公共组件映射](references/component-map.md)：真实组件名称、节点、发布键、属性、Slot 同步方式和已知缺口。
+- [组件调用契约](references/component-invocation-contract.md)：真实属性 Key 动态解析、属性类型、INSTANCE_SWAP、Slot 写入和回读验证。
+- [结构化验收契约](references/structural-validation.md)：实例关系、数量、变量、禁止特征和交付门禁。
+
+同时读取根目录 `VERSION`。交付时返回该版本；Git Commit 可读取时一并返回。
 
 再根据 `platform` 只读取一个平台文件：
 
@@ -62,6 +66,8 @@ pagination / viewport / targetPage / data
 
 只在缺失信息会改变页面主结构、平台外壳或造成高风险误导时提问。其余内容按常见后台场景补全，并在交付中列出假设。用户未指定平台且目标文件没有可靠上下文时，暂按 `yushu` 形成草案并明确标注该假设；不得静默推断。
 
+当用户给出的 `sideActive` 不在当前平台菜单基线中，且没有提供可确认的完整 `sidePath` 时，必须先询问真实父级。不得把新菜单自动追加为一级菜单。
+
 ## 工作流
 
 ### 1. 形成页面规格
@@ -83,26 +89,45 @@ pagination / viewport / targetPage / data
 
 1. 按 `component-map.md` 的精确名称解析组件；节点失效时按名称重新发现，不猜测新 ID。
 2. 同文件使用本地组件节点创建实例；跨文件使用发布键导入。
-3. 记录 `resolved / fallback / missing`。平台专属映射优先覆盖公共映射，未完成盘点前不开始写页面。
+3. 按 `component-invocation-contract.md` 建立 `ComponentResolutionManifest`，记录来源、组件 ID、实例 ID 和 `resolved / missing / ambiguous / failed`。
+4. 平台专属映射优先覆盖公共映射。所有必需组件均为 `resolved` 后才开始写页面。
 
 ### 4. 创建页面
 
 1. 先创建唯一顶层画板，再组装平台 Header、SideNavigation、Content 和 Page Surface。
 2. 内容区优先使用 `Templates / List Page Shell-V2` 实例，并按 `compositionName` 配置 PageHeader、Filter Bar、可选 List Action Bar、Table Shell 和 Pagination Slot。
 3. 按 `page-rules.md` 完成标题、筛选、操作栏、表格、状态、数据与响应布局。
-4. 按 `component-map.md` 写入真实组件属性；自定义表格 Slot 后必须按映射逐层同步 `TableStyleSpec` 并重算外壳高度。
-5. 按当前平台文件组装导航、菜单、颜色和差异组件；平台文件没有声明的内容继续使用通用规则。
+4. 每个实例都按“读取 `componentProperties` → 解析唯一真实 Key → 校验类型和值域 → 写入 → 回读”的闭环配置；不得直接假设 `Label`、`text` 等展示名称就是可写 Key。
+5. 按 `component-invocation-contract.md` 完成 INSTANCE_SWAP 和 Slot；自定义表格 Slot 后按 `component-map.md` 逐层同步 `TableStyleSpec` 并重算外壳高度。
+6. 每完成一个实例就记录属性回读结果。出现 `PROPERTY_READBACK_MISMATCH` 或其他必需写入失败时立即进入“失败关闭”。
+7. 按当前平台文件组装导航、菜单、颜色和差异组件；平台文件没有声明的内容继续使用通用规则。
 
 ### 5. 处理缺口
 
 1. 优先使用现有真实组件的合法组合。
-2. 无法满足时使用页面级最小降级，命名为 `Fallback / <Capability>`，不冒充正式组件。
-3. 在画板相邻位置创建 `Audit / Missing Components`，记录能力、场景、降级方案和建议属性。
-4. 不擅自修改或发布组件库母版；需要补齐平台基线或公共组件时在交付中单独列出。
+2. 只有 `COMPONENT_MISSING`，即组件库经盘点确认没有目标能力时，才评估页面级最小降级，命名为 `Fallback / <Capability>`，不冒充正式组件。
+3. 属性 Key 未找到、属性写入失败、INSTANCE_SWAP 失败、Slot 写入失败、权限不足、字体未加载或节点不可编辑都属于执行失败，不属于组件缺口。
+4. 在画板相邻位置创建 `Audit / Missing Components`，只记录真实能力缺口、场景、降级方案和建议属性。
+5. 不擅自修改或发布组件库母版；需要补齐平台基线或公共组件时在交付中单独列出。
 
-### 6. 验证与交付
+## 失败关闭
 
-按 `page-rules.md`、`component-map.md` 和当前平台文件的验收要求逐区截图检查，再检查整页。至少确认：
+任一必需组件、属性、INSTANCE_SWAP、Slot 或写后验证失败时：
+
+1. 停止组装依赖该结果的后续页面内容；
+2. 保留错误节点 ID、组件名、逻辑属性、真实候选 Key、期望值、实际值和错误代码；
+3. 将结果标记为 `FAIL`，不使用“完成”“已生成”或同义结论；
+4. 不创建覆盖文字、遮盖矩形、替代图标或手绘表格；
+5. 不隐藏真实组件后用 Frame、Group、裸 Text 或截图替代；
+6. 向用户报告可修复的最小阻塞项。
+
+`Navigation Text Overlay`、`Control Text Cover`、`Button Text Cover` 和用于替代真实 Table Shell 的 `Table / Clean` 均是禁止交付特征。改名不改变其失败性质。
+
+只有 Component Map 中确实不存在目标能力时，才按“处理缺口”进入受限 Fallback。
+
+## 验证与交付
+
+先按 `structural-validation.md` 执行结构化验收；结构状态为 `PASS` 后，再按 `page-rules.md`、`component-map.md` 和当前平台文件逐区截图检查并检查整页。至少确认：
 
 - 页面结构、组合名称、平台外壳和 PageSpec 一致；
 - 所有可复用设计系统元素仍为真实实例，Slot 和属性关系正确；
@@ -110,12 +135,14 @@ pagination / viewport / targetPage / data
 - 无文字截断、节点重叠、画板溢出、异常空白、临时截图或占位内容；
 - 组件缺口与运行时假设已记录。
 
-完成后返回：页面节点 ID 与名称、`compositionName`、主要组件及关键变体、平台与输入假设、组件缺口、视觉与结构验证结果。
+只有结构验收和视觉验收均为 `PASS` 时才交付完成结果。返回：Skill 版本与可读取的 Git Commit、页面节点 ID 与名称、`compositionName`、主要组件及关键变体、平台与输入假设、组件解析摘要、属性回读摘要、组件缺口、结构与视觉验证结果。
 
 ## 硬性约束
 
 - 不把参考图作为栅格图片直接交付。
 - 不重画已有组件，不分离实例修改外观，不破坏变量绑定。
+- 不用裸 Text、色块或覆盖层修正组件属性写入失败。
+- 不隐藏 Header、Filter Bar、Table Shell 等真实核心组件后用手绘内容替代。
 - 不擅自改动、补充或发布组件库母版。
 - 不把页面级 List Action Bar 冒充或发布成正式组件。
 - 不把一个平台的导航、颜色、组件映射复制到另一个平台。

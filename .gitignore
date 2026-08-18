@@ -4,9 +4,13 @@
 !.gitignore
 !README.md
 !AGENTS.md
+!docs/
+!docs/**/*.md
 !skills/
 skills/*
 !skills/qifu-list-page/
 !skills/qifu-list-page/**
 
 **/.DS_Store
+**/__pycache__/
+**/*.pyc
