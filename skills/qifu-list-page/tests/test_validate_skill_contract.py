@@ -213,6 +213,34 @@ class SkillContractValidatorTest(unittest.TestCase):
         self.assertIn("左侧是否有多选框：【是 / 否，不填默认否】", readme_text)
         self.assertIn("左侧是否有多选框：否", readme_text)
 
+    def test_missing_figma_plugin_prompt_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        skill_file = copied_root / "SKILL.md"
+        skill_text = skill_file.read_text(encoding="utf-8")
+        skill_file.write_text(
+            skill_text.replace("业务提示词首句必须显式调用 `@figma` 插件", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("@figma", result.stdout)
+
+    def test_readme_prompt_requires_figma_plugin_mention(self) -> None:
+        readme_text = README.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "使用 qifu-list-page Skill，并调用 @figma 插件，在【Figma 地址】的【目标 Page】生成【页面名称】。",
+            readme_text,
+        )
+        self.assertIn(
+            "使用 qifu-list-page Skill，并调用 @figma 插件，在【Figma 地址】的“测试”Page 生成“质检规则版本列表页”。",
+            readme_text,
+        )
+        self.assertNotIn("app://connector_", readme_text)
+
 
 if __name__ == "__main__":
     unittest.main()

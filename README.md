@@ -53,7 +53,7 @@ cd qifu-list-page
 使用 Codex 打开仓库目录，然后在提示词中明确写：
 
 ```text
-使用 qifu-list-page Skill，在毓数平台生成标准列表页……
+使用 qifu-list-page Skill，并调用 @figma 插件，在毓数平台生成标准列表页……
 ```
 
 这种方式会同时读取仓库中的 `AGENTS.md`，适合协作和持续更新。
@@ -72,7 +72,7 @@ cp -R skills/qifu-list-page ~/.codex/skills/
 复制下面模板，只替换 `【】` 中的业务内容。菜单的展开、选中、层级、箭头、组件属性 Key 和 Slot 调用规则已经写在 Skill 中，不需要重复写进提示词。
 
 ```text
-使用 qifu-list-page Skill，在【Figma 地址】的【目标 Page】生成【页面名称】。
+使用 qifu-list-page Skill，并调用 @figma 插件，在【Figma 地址】的【目标 Page】生成【页面名称】。
 
 平台：【不填默认毓数；当前仅支持毓数】；页面标题：【不显示 / 显示：标题文案】。
 
@@ -98,12 +98,14 @@ cp -R skills/qifu-list-page ~/.codex/skills/
 
 未指定正式交付 Page 的试生成、效果验证和 Skill 回归画板统一放在目标组件库的 Figma Page `测试`。
 
+在 Codex 输入框输入 `@figma` 后选择本人已连接的 Figma 插件。选择后界面可能显示为 Figma 应用标签；不要复制其他用户界面生成的 Connector 链接，因为 Connector ID 属于个人连接配置。
+
 列表操作栏只描述表格上方 12px 处的按钮，不决定表格是否显示 Checkbox。即使按钮名称包含“批量”，也只有“左侧是否有多选框：是”才显示表头和数据行多选框；未填写时默认不显示。
 
 ## 提示词示例
 
 ```text
-使用 qifu-list-page Skill，在【Figma 地址】的“测试”Page 生成“质检规则版本列表页”。
+使用 qifu-list-page Skill，并调用 @figma 插件，在【Figma 地址】的“测试”Page 生成“质检规则版本列表页”。
 
 平台：毓数；页面标题：显示“质检规则版本”。
 

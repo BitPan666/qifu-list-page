@@ -26,6 +26,7 @@ REQUIRED_SEMANTICS = {
         "component-invocation-contract.md",
         "Navigation Text Overlay",
         "tableSelection=true|false",
+        "业务提示词首句必须显式调用 `@figma` 插件",
     ),
     "references/component-invocation-contract.md": (
         "componentProperties",

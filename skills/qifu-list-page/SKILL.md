@@ -32,6 +32,8 @@ description: Use when creating, updating, or auditing standard Qifu desktop list
 
 任何 `use_figma` 调用前加载并遵循 `figma-use`；创建或更新完整页面时同时加载并遵循 `figma-generate-design`。若目标项目存在 `AGENTS.md` 或项目级规则，先读取并遵循。
 
+业务提示词首句必须显式调用 `@figma` 插件。在 Codex 输入框输入 `@figma` 并选择当前用户已连接的 Figma Connector；不同用户的 Connector ID 可能不同，因此提示词、示例和 Skill 不得写死 `app://connector_*`。未连接或无法调用 Figma 时停止并报告，不把网页访问或手绘内容当作替代。
+
 ## 规则优先级
 
 在不破坏真实组件实例和目标文件安全的前提下，按以下顺序解决冲突：
