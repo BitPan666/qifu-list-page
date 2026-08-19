@@ -33,14 +33,14 @@
 | 毓数顶部菜单 V2 | `Navigation / HeaderMenu / Yushu Header-V2` | `3639:1529` | `13dd3304a68853196f2a683bba7ebd034e2928ee` | `activeMenu 当前菜单=QBI/数据资产/自助查询/数据开发/指标管理`；固定 Logo、右侧图标、头像和 `panyue` |
 | 顶部菜单项 | `Navigation / HeaderMenu / HeaderMenuItem` | `2525:1111` | `af3b9a17fd68b4a6b9943e91369d864ef9cb4126` | `Icon`、`State=Default/Selected/Hover/Disabled` |
 | 侧边菜单 | `Navigation / SideMenu / SideMenu` | `2406:461` | `0e8b19f82f0b069b5f68e1a7140087532de52167` | `Selected Case` 6 种结构 |
-| 侧边菜单项 V2 | `Navigation / SideMenu / SideMenuItem-V2` | `3650:998` | `cee1612d682da5860d488abc732321c3fd15ad44` | 36 个有效变体；`Label` 已全部接线；`Level=1/2/3`、`Has Submenu`、`State`、`expanded 展开=False/True`；一级菜单支持 `icon 图标`、`showIcon 显示图标`；有子菜单的 `State=Selected` 用于祖先路径高亮（白底，文字/图标/箭头主题绿），无子菜单的 `State=Selected` 用于当前页选中 |
+| 侧边菜单项 V2 | `Navigation / SideMenu / SideMenuItem-V2` | `3650:998` | `cee1612d682da5860d488abc732321c3fd15ad44` | 36 个有效变体；`Label` 已全部接线；`Level=1/2/3`、`Has Submenu`、`State`、`expanded 展开=False/True` 均可按 PageSpec 配置；一级菜单支持 `icon 图标`、`showIcon 显示图标`，可通过真实 Icon ComponentNode 做 INSTANCE_SWAP；有子菜单的 `State=Selected` 用于祖先路径高亮（白底，文字/图标/箭头主题绿），无子菜单的 `State=Selected` 用于当前页选中 |
 | 侧边菜单项（原版兼容） | `Navigation / SideMenu / SideMenuItem` | `2405:81` | `d3804303308830deced4bad8d4369b6ddff2d3f1` | 仅兼容旧页面；新页面改用 V2 |
 | 面包屑项 | `Navigation / Breadcrumb / BreadcrumbItem` | `2555:1395` | `7dfdd65c7174b094be1b68ce133b63f7b9634d50` | `Icon`、`Dropdown`、`State` |
 | 选项卡 | `Navigation / Tabs / Tabs` | `2695:4651` | `501fcf9f50619e0680ec6886b657356cc0b3d991` | `type`、`size`、`item=2..5`、`active=1..5` |
 | 选项卡项 | `Navigation / Tabs / TabItem` | `2695:3345` | `a314f0d8db2719a4bfb79ca6e594d8cd3101df40` | `type=line/card/pill`、`size`、`state` |
 | 普通列表内容外壳 V2 | `Templates / List Page Shell-V2` | `3478:657` | `6e26dad1245c1a7445593586454d6b2c73ff5433` | `pageHeaderSlot`、`filterBarSlot`、`tableSlot`、`showPageHeader`、`showFilterBar`；三个 Slot 使用内容高度 |
 
-本文件只记录组件解析与实现限制。页面结构和 List Action Bar 组合方式以 `page-rules.md` 为准；毓数菜单语义以 `platform-yushu.md` 为准。需要自定义业务文案时按调用契约动态解析文本属性：契约声明存在但当前写入失败属于执行失败；只有核对母版后确认未暴露该能力，才记录组件缺口。
+本文件只记录组件解析与实现限制。页面结构和 List Action Bar 组合方式以 `page-rules.md` 为准；毓数默认菜单与自定义导航输入语义以 `platform-yushu.md` 为准。需要自定义业务文案、层级、子集或图标时按调用契约动态解析属性：契约声明存在但当前写入失败属于执行失败；只有核对母版后确认未暴露该能力，才记录组件缺口。
 
 ## 4. 筛选与动作
 

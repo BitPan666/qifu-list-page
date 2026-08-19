@@ -38,13 +38,15 @@ Component Map 中的 `Label`、`text`、`value 文本` 等是逻辑名称。Figm
 | PageSpec 信息 | ComponentPlan |
 | --- | --- |
 | `platform=yushu`、`headerActive` | 1 个 Yushu Header-V2，设置当前入口 |
-| `sidePath[]`、`sideActive` | 按平台树创建 SideMenuItem-V2 实例，逐项设置文案、层级、状态、展开和图标 |
+| `navigationMode=yushuPreset`、`sidePath[]` | 按毓数默认树和图标映射创建 SideMenuItem-V2，只有当前路径祖先展开 |
+| `navigationMode=custom`、`customSideMenu`、`sidePath[]` | 按自定义配置创建 SideMenuItem-V2；逐项设置文案、层级、子集、状态和展开，一级图标按完整唯一组件名解析并 INSTANCE_SWAP |
 | `compositionName` | List Page Shell-V2、Filter Bar-V2、可选 List Action Bar、Table Shell-V2 的稳定骨架 |
 | `filters[]` | 每项 1 个 Filter Item-V2，加 1 个语义匹配的 Input、Select、DatePicker、DateRange、Checkbox 或 Cascader |
 | `filterItemDisplay` | 写入每个 Filter Item-V2 的显示形式和标题 |
 | `filterTrigger=按钮触发` | Filter Bar-V2 按钮触发变体，加确定/重置 Button 实例 |
 | `filterTrigger=实时触发` | Filter Bar-V2 实时触发变体，不创建确定/重置 |
 | `listActions.left/right` | 页面级 List Action Bar 内创建对应 Button 实例 |
+| `primaryAction` | 页面级 List Action Bar 内创建唯一 Primary Button；按 placement 放在全栏最左或最右 |
 | 批量操作 | Table Shell-V2 `selection=on`，表头和每行插入 Selection Cell-V2 |
 | `columns[]` | 每列 1 个 Header Cell-V2；每行每列 1 个 Content Cell-V2 |
 | 普通文本列 | Content Cell-V2 内放 Text-V2 |
@@ -64,6 +66,8 @@ Component Map 中的 `Label`、`text`、`value 文本` 等是逻辑名称。Figm
 3. 跨文件使用发布 Key 导入，再核对完整名称。
 4. 同名结果多于一个时停止，不按模糊相似度选择。
 5. 创建实例后记录实例 ID、main component ID、组件集名称和来源方式。
+
+自定义一级菜单图标属于精确名称解析：`iconComponentName` 必须符合 `Icon/<system>/<purpose>` 三段式完整路径，并在当前可用组件库中恰好匹配一个 ComponentNode。禁止只按末段、中文用途、Node ID、相似度或画面外观推断；匹配为 0 时报告 `COMPONENT_MISSING`，多于 1 时报告 `COMPONENT_AMBIGUOUS`。
 
 ```text
 ComponentResolutionManifest[]:
@@ -153,7 +157,7 @@ INSTANCE_SWAP 的目标必须是已解析的真实 ComponentNode：
 | Filter Bar-V2 | 更多筛选 | `moreFiltersSlot` | SLOT | 展开筛选时必需 |
 | Filter Bar-V2 | 快捷条件内容 | `quickFiltersSlot` | SLOT | 显示快捷条件时必需 |
 | Filter Bar-V2 | 查询操作 | `queryActionsSlot` | SLOT | 按钮触发时必需 |
-| Filter Bar-V2 | 页面主操作 | `primaryActionSlot` | SLOT | 主操作在筛选栏时必需 |
+| Filter Bar-V2 | 页面主操作 | `primaryActionSlot` | SLOT | 仅兼容旧页面；新列表页不使用 |
 | Input Base-V2 | 文案 | `value 文本` | TEXT | 必需 |
 | Input Base-V2 | 内容状态 | `content 内容` / `content` | VARIANT | 必需 |
 | Input Base-V2 | 尺寸 | `size 尺寸` / `size` | VARIANT | 必需 |

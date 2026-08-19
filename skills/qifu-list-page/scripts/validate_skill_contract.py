@@ -15,6 +15,7 @@ REQUIRED_FILES = (
     "references/component-map.md",
     "references/component-invocation-contract.md",
     "references/structural-validation.md",
+    "references/platform-yushu.md",
 )
 
 REQUIRED_SEMANTICS = {
@@ -32,6 +33,15 @@ REQUIRED_SEMANTICS = {
         "PROPERTY_NOT_FOUND",
         "SLOT_WRITE_FAILED",
         "只有 `COMPONENT_MISSING` 可以进入 Fallback 判断",
+    ),
+    "references/page-rules.md": (
+        "primaryAction.placement=listActions.left|listActions.right",
+        "最多 8 个业务列",
+    ),
+    "references/platform-yushu.md": (
+        "navigationMode=yushuPreset|custom",
+        "Icon/<system>/<purpose>",
+        "只有当前路径祖先可以进入 `sideExpanded`",
     ),
     "references/structural-validation.md": (
         "ComponentResolutionManifest",

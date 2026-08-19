@@ -50,13 +50,17 @@ description: Use when creating, updating, or auditing standard Qifu desktop list
 ```text
 pageName / pageTitle
 platform / headerActive
-sidePath[] / sideActive / sideExpanded[] / sideAncestorsActive[]
+navigationMode=yushuPreset|custom；未填时为 yushuPreset
+sidePath[] / sideActive / sideExpanded[] / sideAncestorsActive[] / sideActiveLevel
+customSideMenu.level1[]: label, iconComponentName, hasChildren
+customSideMenu.activeLevel1Children[]: label, hasChildren
+customSideMenu.activeLevel2Children[]: label
 compositionName
 filters[]: field, control, placeholder, required, defaultValue, widthTier
 filterItemDisplay: 直接筛选框 | 带标题筛选项
 filterTrigger: 实时触发 | 按钮触发
 controlSize
-primaryAction: text, placement=filterBar|listActions.right；没有时为 null
+primaryAction: text, placement=listActions.left|listActions.right；没有时为 null
 listActions.left[] / listActions.right[]；right 只记录主动作之外的次要动作
 columns[] / rowActions[] / status
 pagination / viewport / targetPage / data
@@ -66,7 +70,7 @@ pagination / viewport / targetPage / data
 
 只在缺失信息会改变页面主结构、平台外壳或造成高风险误导时提问。其余内容按常见后台场景补全，并在交付中列出假设。用户未指定平台且目标文件没有可靠上下文时，暂按 `yushu` 形成草案并明确标注该假设；不得静默推断。
 
-当用户给出的 `sideActive` 不在当前平台菜单基线中，且没有提供可确认的完整 `sidePath` 时，必须先询问真实父级。不得把新菜单自动追加为一级菜单。
+`navigationMode=yushuPreset` 时，`sidePath` 必须存在于毓数默认菜单基线；不在基线且没有切换为 `custom` 时，必须先询问真实父级，不得把新菜单自动追加为一级菜单。`navigationMode=custom` 时按平台文件要求校验完整路径、一级菜单、当前一级下的二级菜单、必要的三级菜单和一级真实 Icon 组件名；缺少会改变层级、箭头或选中状态的信息时停止提问，不自行补树。
 
 ## 工作流
 
@@ -75,13 +79,13 @@ pagination / viewport / targetPage / data
 1. 从输入提取 `PageSpec`。
 2. 按 `page-rules.md` 的组合决策表确定唯一 `compositionName`；完整名称精确匹配，未指定时按场景选择，不创造近义别名。
 3. 将筛选条件映射为 Input、Search、Select、Checkbox、DatePicker 等语义控件。
-4. 将动作分为查询动作、列表操作栏左侧动作、列表操作栏右侧次要动作、单一主动作和行操作；主动作通过 `primaryAction.placement` 决定位置，不重复写入 `listActions.right[]`。
-5. 将列标注为 identifier、name、long-text、number、date、status、action 等语义。
+4. 将动作分为查询动作、列表操作栏左侧动作、列表操作栏右侧次要动作、单一主动作和行操作；主动作通过 `primaryAction.placement` 决定列表操作栏最左或最右，不重复写入左右次要动作数组。
+5. 将列标注为 identifier、name、long-text、number、date、status、action 等语义；1366px 画板最多保留 8 个业务列，操作列和状态列计入，自动选择列不计入。
 
 ### 2. 确认平台与目标位置
 
 1. 根据读取路由只加载当前平台资料。
-2. 解析 `headerActive`、`sidePath`、`sideActive`、`sideExpanded`，并从 `sidePath` 排除 `sideActive` 得到 `sideAncestorsActive`。
+2. 解析 `navigationMode`、`headerActive` 和 `sidePath`；`sideActive` 固定为路径最后一项，`sideActiveLevel=sidePath.length`，`sideExpanded` 与 `sideAncestorsActive` 固定为路径中除最后一项外的祖先，不允许额外展开其他菜单。
 3. 确认目标 Figma 文件、Page 和插入位置，不默认写入第一个 Page。
 4. 测试、效果验证、试生成和 Skill 回归固定复用 Page `测试`（node `3497:651`）；正式交付按用户指定。
 
@@ -100,7 +104,7 @@ pagination / viewport / targetPage / data
 4. 每个实例都按“读取 `componentProperties` → 解析唯一真实 Key → 校验类型和值域 → 写入 → 回读”的闭环配置；不得直接假设 `Label`、`text` 等展示名称就是可写 Key。
 5. 按 `component-invocation-contract.md` 完成 INSTANCE_SWAP 和 Slot；自定义表格 Slot 后按 `component-map.md` 逐层同步 `TableStyleSpec` 并重算外壳高度。
 6. 每完成一个实例就记录属性回读结果。出现 `PROPERTY_READBACK_MISMATCH` 或其他必需写入失败时立即进入“失败关闭”。
-7. 按当前平台文件组装导航、菜单、颜色和差异组件；平台文件没有声明的内容继续使用通用规则。
+7. 按当前平台文件组装导航、菜单、颜色和差异组件；默认模式使用已确认菜单预设，自定义模式严格使用 PageSpec 菜单数据，并以完整、唯一的 Icon 组件名解析一级图标。平台文件没有声明的内容继续使用通用规则。
 
 ### 5. 处理缺口
 
@@ -130,6 +134,7 @@ pagination / viewport / targetPage / data
 先按 `structural-validation.md` 执行结构化验收；结构状态为 `PASS` 后，再按 `page-rules.md`、`component-map.md` 和当前平台文件逐区截图检查并检查整页。至少确认：
 
 - 页面结构、组合名称、平台外壳和 PageSpec 一致；
+- 导航只有一个当前菜单，仅当前路径祖先展开；自定义一级图标均通过真实 INSTANCE_SWAP 写入并回读成功；
 - 所有可复用设计系统元素仍为真实实例，Slot 和属性关系正确；
 - 筛选显示形式、触发方式、列表操作、选择列、数据状态和分页没有串位；
 - 无文字截断、节点重叠、画板溢出、异常空白、临时截图或占位内容；

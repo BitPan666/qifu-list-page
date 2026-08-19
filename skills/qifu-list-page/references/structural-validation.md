@@ -39,12 +39,12 @@ PageSpec 完整性
 
 - 目标 Figma 文件或目标 Page；
 - 平台无法从用户或目标文件确定；
-- `sidePath` 指向的平台菜单不存在；
-- 用户给出新菜单名称但未说明其真实父级；
+- 默认导航模式下 `sidePath` 指向的平台菜单不存在；
+- 自定义导航没有提供完整 `sidePath`，或缺少当前一级下的二级清单、二级 `hasChildren`、必要的三级清单或一级真实 Icon 组件名；
 - 需要批量操作但未确认是否显示选择列；
 - 主动作与列表次要动作无法区分。
 
-平台菜单基线不存在某业务菜单时，不把它追加为一级菜单。先询问真实完整路径。
+平台菜单基线不存在某业务菜单时，不把它追加为一级菜单。先询问真实完整路径，或请用户明确切换为 `navigationMode=custom` 并提供自定义菜单输入。
 
 ## 3. 组件与实例关系
 
@@ -63,10 +63,12 @@ PageSpec 完整性
 平台导航至少验证：
 
 - Header 真实实例数量为 1，当前入口等于 `headerActive`；
-- 侧栏只有一个叶子项为当前页；
-- `sidePath`、展开父级和祖先激活与 PageSpec 一致；
+- 侧栏恰好一个菜单项为当前页，层级等于 `sidePath.length`；
+- `sideActive` 等于 `sidePath` 最后一项，`sideExpanded` 与 `sideAncestorsActive` 只包含当前路径祖先；
+- 不在当前路径中的一级菜单全部收起；不在当前路径中的二级菜单即使有子集也保持收起；
+- 当前一级下的每个二级菜单，其 `Has Submenu` 和箭头显示与 PageSpec 的 `hasChildren` 一致；只有当前路径经过的二级菜单允许展开并显示三级菜单；
 - 每个 SideMenuItem 的 Label 回读值等于业务文案，不保留“菜单项”等默认值；
-- 一级菜单 `showIcon=true`，图标 main component ID 等于平台映射；
+- 一级菜单 `showIcon=true`；默认模式的图标 main component ID 等于平台映射，自定义模式等于 `iconComponentName` 精确解析结果；
 - 二、三级菜单不显示业务图标；
 - 多个一级菜单不能全部保持同一个母版默认图标；
 - 未确认的菜单没有被自行追加。
@@ -83,6 +85,7 @@ PageSpec 完整性
 - 确定为主要按钮，重置为线框按钮；
 - Filter Bar 到 List Action Bar 为 16px，List Action Bar 到 Table Shell 为 12px；
 - 页面只有一个视觉最强主动作，且未同时出现在 Filter Bar 和 List Action Bar；
+- 主动作只位于 List Action Bar：`listActions.left` 时为全栏最左，`listActions.right` 时为全栏最右；只有主动作时操作栏仍存在；
 - 批量动作存在时 `selection=on`，零选择时按规则禁用。
 
 ## 6. 表格与分页
@@ -97,6 +100,8 @@ Content Cell-V2 per row = columns.length
 Selection Cell-V2 = 0，或 data.length + 1
 Pagination-V2 = showPagination ? 1 : 0
 ```
+
+在 `1366 × 768` 画板中，`columns.length` 最多 8 个业务列；状态列和操作列计入，自动 Selection Cell 不计入。超过上限且未明确 1920、删列或横向滚动方案时状态为 `BLOCKED`。
 
 同时验证：
 

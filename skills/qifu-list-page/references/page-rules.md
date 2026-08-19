@@ -115,16 +115,16 @@ Page Surface 的 16px 是唯一页面内容外边距。Filter Bar 可见底边�
 - Filter Item 与内部控件为 FIXED，不使用 FILL 拉伸。筛选 Slot 使用水平 Auto Layout 并开启 WRAP；常规横向/换行间距为 12px。小屏 4 项一行时，4 个筛选项的剩余横向空间通过 `SPACE_BETWEEN` 或等效方式均分到项间，控件自身宽度不得被均分。
 - `直接筛选框` 总宽度等于控件宽度；`带标题筛选项` 为“标题 HUG + 0px + 控件宽度”，标题与控件紧贴，以实际几何间距验证。
 - 普通页面统一使用 32px 控件；同一筛选栏不得混用显示形式、标题字号或控件高度。
-- Filter Bar padding 为 0；首个筛选项与页面主操作直接对齐 Page Surface 左右 16px 内容边界。
+- Filter Bar padding 为 0；首个筛选项对齐 Page Surface 左侧 16px 内容边界。页面主操作不放在 Filter Bar，统一进入 List Action Bar。
 - `实时触发` 不显示确定/重置，文本模糊搜索使用 Search；`按钮触发` 统一显示确定/重置，文本筛选使用 Input。两种触发只能选择一种。
-- 按钮触发时，确定/重置跟随筛选项最后一行；页面主操作固定在第一行最右侧，不与查询按钮混为一组。
-- `showQuickFilters`、`showPrimaryAction` 默认关闭，只有 PageSpec 明确需要时开启。
+- 按钮触发时，确定/重置跟随筛选项最后一行，不与列表操作或页面主操作混为一组。
+- `showQuickFilters` 默认关闭，只有 PageSpec 明确需要时开启；新列表页的 `showPrimaryAction` 固定关闭。
 
 精确组件属性、尺寸映射、文本属性和 Slot 最小高度见 `component-map.md`。
 
 ## 5. 列表操作栏
 
-只有 `listActions.left[]` 或 `listActions.right[]` 非空时才创建：
+只要 `listActions.left[]`、`listActions.right[]` 或 `primaryAction` 任一存在就创建：
 
 ```text
 tableSlot → Data Region（Vertical, Fill, gap 12）
@@ -137,8 +137,10 @@ tableSlot → Data Region（Vertical, Fill, gap 12）
 
 Filter Bar 可见底边到 List Action Bar 顶边固定为 16px；Data Region 内 List Action Bar 到 Table Shell 的间距仍为 12px。
 
-- 左侧放与选择或当前数据相关的批量动作；依赖选择的动作在零选择时可见但禁用，危险动作需要确认。
-- 右侧先放 `listActions.right[]` 中的刷新、导入、导出、列设置等次要动作，再放 `primaryAction`；主动作只通过 `primaryAction.placement=listActions.right` 表达，不重复写入右侧数组，唯一 Primary 固定在最右侧。
+- `primaryAction.placement=listActions.left|listActions.right`，分别表示“列表操作栏最左侧 / 列表操作栏最右侧”；页面只允许一个主动作。
+- 左侧放与选择或当前数据相关的批量动作；主动作位于左侧时先放主动作，再放 `listActions.left[]`。依赖选择的动作在零选择时可见但禁用，危险动作需要确认。
+- 右侧放刷新、导入、导出、列设置等 `listActions.right[]` 次要动作；主动作位于右侧时放在所有右侧次要动作之后，固定为最右侧。
+- 主动作只通过 `primaryAction` 表达，不重复写入任一 `listActions` 数组；只有主动作而没有次要动作时仍创建 List Action Bar。
 - 确定/重置只属于 Filter Bar；查看、编辑、删除等单条动作只属于表格行。
 - 操作栏出现时关闭 Filter Bar 的 `showPrimaryAction`，同一动作不得重复。
 - 操作过多时保留高频项并使用已有更多菜单；无可复用能力时记录缺口，不换行或缩小按钮。
@@ -162,6 +164,8 @@ Filter Bar 可见底边到 List Action Bar 顶边固定为 16px；Data Region �
 所有列宽之和等于表格可用宽度，表头与每行使用同一列宽数组；第一列贴左、最后一列贴右，不使用 `SPACE_BETWEEN` 制造空白带。
 
 行操作 1–4 个时使用 Action Content-V2；超过 4 个收纳低频操作。删除、解绑、停用等高风险操作需要确认。状态切换动作必须随记录状态变化：启用记录显示“停用”，禁用记录显示“启用”。
+
+`1366 × 768` 常规画板最多 8 个业务列，状态列和操作列均计入，Table Shell 自动生成的选择列不计入。超过 8 个业务列时不得通过缩小字号、压扁列宽或隐藏文案硬塞；在生成前向用户确认以下一种方案：改用 `1920 × 1080`、删除低优先级列，或明确采用横向滚动。
 
 ## 7. 数据、状态与分页
 

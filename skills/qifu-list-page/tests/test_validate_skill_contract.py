@@ -56,6 +56,63 @@ class SkillContractValidatorTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("失败关闭", result.stdout)
 
+    def test_missing_platform_navigation_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        (copied_root / "references" / "platform-yushu.md").unlink()
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("platform-yushu.md", result.stdout)
+
+    def test_missing_custom_navigation_mode_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        platform_file = copied_root / "references" / "platform-yushu.md"
+        platform_text = platform_file.read_text(encoding="utf-8")
+        platform_file.write_text(
+            platform_text.replace("navigationMode=yushuPreset|custom", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("navigationMode=yushuPreset|custom", result.stdout)
+
+    def test_missing_list_action_placement_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        rules_file = copied_root / "references" / "page-rules.md"
+        rules_text = rules_file.read_text(encoding="utf-8")
+        rules_file.write_text(
+            rules_text.replace(
+                "primaryAction.placement=listActions.left|listActions.right", ""
+            ),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("primaryAction.placement", result.stdout)
+
+    def test_missing_table_column_limit_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        rules_file = copied_root / "references" / "page-rules.md"
+        rules_text = rules_file.read_text(encoding="utf-8")
+        rules_file.write_text(
+            rules_text.replace("最多 8 个业务列", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("最多 8 个业务列", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
