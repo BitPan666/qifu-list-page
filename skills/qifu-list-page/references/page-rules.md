@@ -24,11 +24,11 @@
 | `Qifu List Page / Basic Table` | 无筛选条件的普通数据列表 | 隐藏 | 按 `listActions` 显示 | `selection=off` | 数据行 | 默认显示 |
 | `Qifu List Page / Basic Filter Table` | 1–4 个常用筛选条件；默认组合 | 单行，`expanded=false` | 按 `listActions` 显示 | `selection=off` | 数据行 | 默认显示 |
 | `Qifu List Page / Advanced Filter Table` | 5 个以上筛选条件或明确要求更多筛选 | 两行，`expanded=true` | 按 `listActions` 显示 | `selection=off` | 数据行 | 默认显示 |
-| `Qifu List Page / Selectable Filter Table` | 需要行选择或批量操作 | 1–4 项单行，更多时两行 | 批量动作存在时显示 | `selection=on` | 数据行 | 默认显示 |
+| `Qifu List Page / Selectable Filter Table` | PageSpec 明确 `tableSelection=true` | 1–4 项单行，更多时两行 | 按 `listActions` 显示 | `selection=on` | 数据行 | 默认显示 |
 | `Qifu List Page / Loading Table` | 首次加载或刷新状态 | 按筛选需求显示 | 默认隐藏 | `selection=off` | Loading | 隐藏 |
 | `Qifu List Page / Empty Table` | 无数据、无结果、无权限或加载失败 | 按筛选需求显示 | 默认隐藏 | `selection=off` | Empty 与对应状态 | 隐藏 |
 
-选择顺序：Loading/Empty → 需要选择或批量操作 → 5 个以上筛选 → 1–4 个筛选 → 无筛选。未指定且无法区分时使用 `Qifu List Page / Basic Filter Table`。
+选择顺序：Loading/Empty → `tableSelection=true` → 5 个以上筛选 → 1–4 个筛选 → 无筛选。未指定且无法区分时使用 `Qifu List Page / Basic Filter Table`。列表操作栏不会自动开启选择列，即使按钮名称包含“批量”；只有提示词“左侧是否有多选框：是”才能令 `tableSelection=true`。
 
 组合名称只决定稳定骨架。标题、筛选显示形式、触发方式、业务字段、操作、列、数据、表格 `size/type` 和分页总数继续来自 `PageSpec`；不要为这些独立配置新增组合名。新场景先用最接近组合并记录缺口，只有确认需要长期复用后才扩展注册表。
 
@@ -63,7 +63,6 @@ Page / List / <pageName> / Default
     ├── SideNavigation（当前平台真实组件）
     └── Content（灰色背景）
         └── Page Surface（白色，距 Content 四周 12px）
-            ├── ContextNavigation（按需）
             └── List Page Shell-V2 Instance（距 Page Surface 四周 16px）
                 ├── pageHeaderSlot
                 ├── filterBarSlot → Filter Bar-V2 Instance
@@ -82,14 +81,11 @@ Page Surface 的 16px 是唯一页面内容外边距。Filter Bar 可见底边�
 
 先创建外层，再实例化 List Page Shell-V2，最后替换 Slot。组合只控制 Slot 状态，不取代组件正式名称；组件实现全部按 `component-map.md`。
 
-## 3. 上下文导航与标题
+## 3. 标题与内容区导航
 
-先读取当前平台文件确定 Header、SideNavigation、菜单、颜色与平台组件，再判断内容区导航：
+先读取当前平台文件确定 Header、SideNavigation、菜单、颜色与平台组件。`sidePath 只控制左侧菜单`的层级、展开、祖先激活和当前项，不与内容区域建立结构关系。本 Skill 的标准列表页不根据一级、二级或三级菜单路径生成 Breadcrumb，提示词没有明确要求的内容区导航不得添加。
 
-- 单一路径、无同级切换：按业务需要使用标题；
-- 多层路径：使用 Breadcrumb；标题仍独立服从 PageSpec；
-- 同级视图切换：使用 Tabs；标题仍独立服从 PageSpec；
-- 多任务可关闭页签：需要 WorkspaceTabs，普通 Tabs 不得冒充。
+只有 PageSpec 明确提出同级视图切换时才使用真实 Tabs；明确提出多任务可关闭页签时需要 WorkspaceTabs，普通 Tabs 不得冒充。组件库没有对应真实能力时按失败关闭或缺口规则处理，不自行拼装近似组件。
 
 一张默认页面只允许一个叶子菜单处于当前选中状态。父菜单展开、当前页选中和祖先路径高亮必须分别处理，具体样式由平台文件定义。
 
@@ -124,6 +120,8 @@ Page Surface 的 16px 是唯一页面内容外边距。Filter Bar 可见底边�
 
 ## 5. 列表操作栏
 
+列表操作栏只描述 Table Shell 上方 12px 的按钮，是独立于表格选择列的页面级区域。
+
 只要 `listActions.left[]`、`listActions.right[]` 或 `primaryAction` 任一存在就创建：
 
 ```text
@@ -138,7 +136,7 @@ tableSlot → Data Region（Vertical, Fill, gap 12）
 Filter Bar 可见底边到 List Action Bar 顶边固定为 16px；Data Region 内 List Action Bar 到 Table Shell 的间距仍为 12px。
 
 - `primaryAction.placement=listActions.left|listActions.right`，分别表示“列表操作栏最左侧 / 列表操作栏最右侧”；页面只允许一个主动作。
-- 左侧放与选择或当前数据相关的批量动作；主动作位于左侧时先放主动作，再放 `listActions.left[]`。依赖选择的动作在零选择时可见但禁用，危险动作需要确认。
+- 左侧放业务操作按钮；主动作位于左侧时先放主动作，再放 `listActions.left[]`。按钮是否禁用、是否依赖选中数据只服从 PageSpec 的明确交互要求，不从“批量”等文案推断；危险动作需要确认。
 - 右侧放刷新、导入、导出、列设置等 `listActions.right[]` 次要动作；主动作位于右侧时放在所有右侧次要动作之后，固定为最右侧。
 - 主动作只通过 `primaryAction` 表达，不重复写入任一 `listActions` 数组；只有主动作而没有次要动作时仍创建 List Action Bar。
 - 确定/重置只属于 Filter Bar；查看、编辑、删除等单条动作只属于表格行。
@@ -147,7 +145,7 @@ Filter Bar 可见底边到 List Action Bar 顶边固定为 16px；Data Region �
 
 ## 6. 表格与列
 
-先由组合确定 `selection` 与 `rowsSlot` 状态，再形成唯一 `TableStyleSpec={size,type,selection}`。未指定时默认 `size=large 大 44px`、`type=basic 基础`，`selection` 由组合决定。自定义 Slot 后必须按 `component-map.md` 逐层同步所有 Header Cell、Row、Content Cell 与 Selection Cell，并重算 Table Shell 高度。
+先由 PageSpec 的 `tableSelection` 确定 `selection`，再由组合确定 `rowsSlot` 状态，并形成唯一 `TableStyleSpec={size,type,selection}`。未指定时默认 `size=large 大 44px`、`type=basic 基础`、`selection=off`。列表操作栏及其按钮文案不得改变 `selection`。自定义 Slot 后必须按 `component-map.md` 逐层同步所有 Header Cell、Row、Content Cell 与 Selection Cell，并重算 Table Shell 高度。
 
 列宽按语义分配：
 
@@ -192,7 +190,6 @@ Header / Global
 Workspace
 Navigation / Side
 Content
-ContextNavigation
 PageHeader
 FilterToolbar
 Filter / <field>

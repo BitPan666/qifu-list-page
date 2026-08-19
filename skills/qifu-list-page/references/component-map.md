@@ -35,7 +35,6 @@
 | 侧边菜单 | `Navigation / SideMenu / SideMenu` | `2406:461` | `0e8b19f82f0b069b5f68e1a7140087532de52167` | `Selected Case` 6 种结构 |
 | 侧边菜单项 V2 | `Navigation / SideMenu / SideMenuItem-V2` | `3650:998` | `cee1612d682da5860d488abc732321c3fd15ad44` | 36 个有效变体；`Label` 已全部接线；`Level=1/2/3`、`Has Submenu`、`State`、`expanded 展开=False/True` 均可按 PageSpec 配置；一级菜单支持 `icon 图标`、`showIcon 显示图标`，可通过真实 Icon ComponentNode 做 INSTANCE_SWAP；有子菜单的 `State=Selected` 用于祖先路径高亮（白底，文字/图标/箭头主题绿），无子菜单的 `State=Selected` 用于当前页选中 |
 | 侧边菜单项（原版兼容） | `Navigation / SideMenu / SideMenuItem` | `2405:81` | `d3804303308830deced4bad8d4369b6ddff2d3f1` | 仅兼容旧页面；新页面改用 V2 |
-| 面包屑项 | `Navigation / Breadcrumb / BreadcrumbItem` | `2555:1395` | `7dfdd65c7174b094be1b68ce133b63f7b9634d50` | `Icon`、`Dropdown`、`State` |
 | 选项卡 | `Navigation / Tabs / Tabs` | `2695:4651` | `501fcf9f50619e0680ec6886b657356cc0b3d991` | `type`、`size`、`item=2..5`、`active=1..5` |
 | 选项卡项 | `Navigation / Tabs / TabItem` | `2695:3345` | `a314f0d8db2719a4bfb79ca6e594d8cd3101df40` | `type=line/card/pill`、`size`、`state` |
 | 普通列表内容外壳 V2 | `Templates / List Page Shell-V2` | `3478:657` | `6e26dad1245c1a7445593586454d6b2c73ff5433` | `pageHeaderSlot`、`filterBarSlot`、`tableSlot`、`showPageHeader`、`showFilterBar`；三个 Slot 使用内容高度 |
@@ -123,7 +122,7 @@ Table Shell-V2 的 `size`、`type`、`selection` 只决定母版默认 Slot 内�
 同步顺序：
 
 1. 设置 Table Shell V2 的 `size/type/selection`。
-2. 替换 `headerSlot` 后，遍历全部 Header Cell-V2，并按同一个 `TableStyleSpec` 设置 `size/divider`；若显示选择列，表头 Selection Cell-V2 的背景必须绑定 `背景色/--qifu-bg-color-canvas`，不得沿用数据行的 surface 背景。
+2. 替换 `headerSlot` 后，遍历全部 Header Cell-V2，并按同一个 `TableStyleSpec` 设置 `size/divider`；若显示选择列，表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`，与其他表头单元格保持同色，不得沿用数据行的 surface 背景。
 3. 替换 `rowsSlot` 后，先设置每个 Row-V2，再遍历该行全部 Content Cell-V2；斑马纹背景必须同时写到 Row、Content Cell 和 Selection Cell-V2。
 4. 按 `selection` 显式插入或移除选择单元格，不依赖 Shell 自动增删。
 5. 独立配置 `paginationSlot`。Pagination-V2 不继承表格的 `size/type/selection`；先计算 `pageCount=ceil(total/pageSize)`，选择对应页数变体，再设置 `size`、三个区域布尔属性和文案属性。

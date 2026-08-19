@@ -8,6 +8,7 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = SKILL_ROOT / "scripts" / "validate_skill_contract.py"
+README = SKILL_ROOT.parents[1] / "README.md"
 
 
 class SkillContractValidatorTest(unittest.TestCase):
@@ -112,6 +113,105 @@ class SkillContractValidatorTest(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("最多 8 个业务列", result.stdout)
+
+    def test_missing_explicit_table_selection_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        skill_file = copied_root / "SKILL.md"
+        skill_text = skill_file.read_text(encoding="utf-8")
+        skill_file.write_text(
+            skill_text.replace("tableSelection=true|false", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("tableSelection=true|false", result.stdout)
+
+    def test_missing_list_action_selection_decoupling_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        rules_file = copied_root / "references" / "page-rules.md"
+        rules_text = rules_file.read_text(encoding="utf-8")
+        rules_file.write_text(
+            rules_text.replace("列表操作栏不会自动开启选择列", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("列表操作栏不会自动开启选择列", result.stdout)
+
+    def test_missing_list_action_location_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        rules_file = copied_root / "references" / "page-rules.md"
+        rules_text = rules_file.read_text(encoding="utf-8")
+        rules_file.write_text(
+            rules_text.replace("列表操作栏只描述 Table Shell 上方 12px 的按钮", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("列表操作栏只描述 Table Shell 上方 12px 的按钮", result.stdout)
+
+    def test_missing_side_path_content_decoupling_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        rules_file = copied_root / "references" / "page-rules.md"
+        rules_text = rules_file.read_text(encoding="utf-8")
+        rules_file.write_text(
+            rules_text.replace("sidePath 只控制左侧菜单", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("sidePath 只控制左侧菜单", result.stdout)
+
+    def test_missing_selection_header_canvas_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        component_map = copied_root / "references" / "component-map.md"
+        component_text = component_map.read_text(encoding="utf-8")
+        component_map.write_text(
+            component_text.replace(
+                "表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`",
+                "",
+            ),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("--qifu-bg-color-canvas", result.stdout)
+
+    def test_missing_ancestor_selected_state_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        platform_file = copied_root / "references" / "platform-yushu.md"
+        platform_text = platform_file.read_text(encoding="utf-8")
+        platform_file.write_text(
+            platform_text.replace("所有祖先都使用 `State=Selected`", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("所有祖先都使用 `State=Selected`", result.stdout)
+
+    def test_readme_prompt_exposes_table_selection_toggle(self) -> None:
+        readme_text = README.read_text(encoding="utf-8")
+
+        self.assertIn("左侧是否有多选框：【是 / 否，不填默认否】", readme_text)
+        self.assertIn("左侧是否有多选框：否", readme_text)
 
 
 if __name__ == "__main__":

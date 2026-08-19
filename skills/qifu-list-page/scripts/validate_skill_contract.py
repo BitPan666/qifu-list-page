@@ -25,6 +25,7 @@ REQUIRED_SEMANTICS = {
         "structural-validation.md",
         "component-invocation-contract.md",
         "Navigation Text Overlay",
+        "tableSelection=true|false",
     ),
     "references/component-invocation-contract.md": (
         "componentProperties",
@@ -37,11 +38,18 @@ REQUIRED_SEMANTICS = {
     "references/page-rules.md": (
         "primaryAction.placement=listActions.left|listActions.right",
         "最多 8 个业务列",
+        "列表操作栏不会自动开启选择列",
+        "列表操作栏只描述 Table Shell 上方 12px 的按钮",
+        "sidePath 只控制左侧菜单",
+    ),
+    "references/component-map.md": (
+        "表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`",
     ),
     "references/platform-yushu.md": (
         "navigationMode=yushuPreset|custom",
         "Icon/<system>/<purpose>",
         "只有当前路径祖先可以进入 `sideExpanded`",
+        "所有祖先都使用 `State=Selected`",
     ),
     "references/structural-validation.md": (
         "ComponentResolutionManifest",

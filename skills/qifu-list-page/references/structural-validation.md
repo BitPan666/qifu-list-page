@@ -41,7 +41,6 @@ PageSpec 完整性
 - 平台无法从用户或目标文件确定；
 - 默认导航模式下 `sidePath` 指向的平台菜单不存在；
 - 自定义导航没有提供完整 `sidePath`，或缺少当前一级下的二级清单、二级 `hasChildren`、必要的三级清单或一级真实 Icon 组件名；
-- 需要批量操作但未确认是否显示选择列；
 - 主动作与列表次要动作无法区分。
 
 平台菜单基线不存在某业务菜单时，不把它追加为一级菜单。先询问真实完整路径，或请用户明确切换为 `navigationMode=custom` 并提供自定义菜单输入。
@@ -86,7 +85,7 @@ PageSpec 完整性
 - Filter Bar 到 List Action Bar 为 16px，List Action Bar 到 Table Shell 为 12px；
 - 页面只有一个视觉最强主动作，且未同时出现在 Filter Bar 和 List Action Bar；
 - 主动作只位于 List Action Bar：`listActions.left` 时为全栏最左，`listActions.right` 时为全栏最右；只有主动作时操作栏仍存在；
-- 批量动作存在时 `selection=on`，零选择时按规则禁用。
+- Table Shell 的 `selection` 只等于 PageSpec 的 `tableSelection`：是为 `on`，否或未填写为 `off`；不得从列表操作按钮或“批量”文案推断。
 
 ## 6. 表格与分页
 
@@ -107,7 +106,7 @@ Pagination-V2 = showPagination ? 1 : 0
 
 - Table Shell 不是隐藏状态；
 - `TableStyleSpec` 已同步到 Shell、Header Cell、Row、Content Cell 和 Selection Cell；
-- 表头选择单元格背景绑定 `背景色/--qifu-bg-color-canvas`；
+- 显示选择列时，表头选择单元格背景绑定 `背景色/--qifu-bg-color-canvas`，与其他表头单元格使用同一 canvas 背景；
 - 文本格使用 Text-V2，二元启用/禁用使用 Tag，多状态使用 Status-V2，行操作使用 Action Content-V2；
 - 启用 Tag 为 `light/success/medium/square`，禁用 Tag 为 `light/danger/medium/square`，两者 `disabled=false`；
 - 每列宽度数组在表头和所有行中一致，总和等于可见表宽；

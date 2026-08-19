@@ -1,4 +1,4 @@
 interface:
   display_name: "Qifu List Page"
   short_description: "按平台规则与真实组件生成、验证并交付奇富后台标准列表页"
-  default_prompt: "使用 $qifu-list-page，根据平台、页面结构、筛选与表格要求，在 Figma 中生成可编辑的奇富后台列表页；组件属性或 Slot 写入失败时停止并报告，不使用覆盖文字或手绘替代。"
+  default_prompt: "使用 $qifu-list-page，根据平台、页面结构、筛选、列表操作、显式多选框配置与表格要求，在 Figma 中生成可编辑的奇富后台列表页；不根据菜单路径添加内容区导航，不根据按钮文案推断选择列，组件属性或 Slot 写入失败时停止并报告。"

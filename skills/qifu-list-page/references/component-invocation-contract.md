@@ -47,7 +47,8 @@ Component Map 中的 `Label`、`text`、`value 文本` 等是逻辑名称。Figm
 | `filterTrigger=实时触发` | Filter Bar-V2 实时触发变体，不创建确定/重置 |
 | `listActions.left/right` | 页面级 List Action Bar 内创建对应 Button 实例 |
 | `primaryAction` | 页面级 List Action Bar 内创建唯一 Primary Button；按 placement 放在全栏最左或最右 |
-| 批量操作 | Table Shell-V2 `selection=on`，表头和每行插入 Selection Cell-V2 |
+| `tableSelection=true`（提示词“左侧是否有多选框：是”） | Table Shell-V2 `selection=on`，表头和每行插入 Selection Cell-V2 |
+| `tableSelection=false` 或未填写 | Table Shell-V2 `selection=off`，不插入 Selection Cell-V2；列表操作按钮不改变此结果 |
 | `columns[]` | 每列 1 个 Header Cell-V2；每行每列 1 个 Content Cell-V2 |
 | 普通文本列 | Content Cell-V2 内放 Text-V2 |
 | 启用/禁用二元状态 | Content Cell-V2 内放 Tag |

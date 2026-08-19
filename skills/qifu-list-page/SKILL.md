@@ -63,10 +63,11 @@ controlSize
 primaryAction: text, placement=listActions.left|listActions.right；没有时为 null
 listActions.left[] / listActions.right[]；right 只记录主动作之外的次要动作
 columns[] / rowActions[] / status
+tableSelection=true|false；对应提示词“左侧是否有多选框：是/否”，未填写时为 false
 pagination / viewport / targetPage / data
 ```
 
-解析顺序固定为：平台 → 顶部入口 → 侧栏完整路径 → 页面名称与标题 → 筛选 → 列表操作栏 → 页面主动作 → 表格 → 行操作 → 状态、数据与画板。
+解析顺序固定为：平台 → 顶部入口 → 侧栏完整路径 → 页面名称与标题 → 筛选 → 列表操作栏 → 页面主动作 → 表格列 → 表格多选框 → 行操作 → 状态、数据与画板。
 
 只在缺失信息会改变页面主结构、平台外壳或造成高风险误导时提问。其余内容按常见后台场景补全，并在交付中列出假设。用户未指定平台且目标文件没有可靠上下文时，暂按 `yushu` 形成草案并明确标注该假设；不得静默推断。
 
@@ -79,8 +80,9 @@ pagination / viewport / targetPage / data
 1. 从输入提取 `PageSpec`。
 2. 按 `page-rules.md` 的组合决策表确定唯一 `compositionName`；完整名称精确匹配，未指定时按场景选择，不创造近义别名。
 3. 将筛选条件映射为 Input、Search、Select、Checkbox、DatePicker 等语义控件。
-4. 将动作分为查询动作、列表操作栏左侧动作、列表操作栏右侧次要动作、单一主动作和行操作；主动作通过 `primaryAction.placement` 决定列表操作栏最左或最右，不重复写入左右次要动作数组。
+4. 将动作分为查询动作、列表操作栏左侧动作、列表操作栏右侧次要动作、单一主动作和行操作；主动作通过 `primaryAction.placement` 决定列表操作栏最左或最右，不重复写入左右次要动作数组。列表操作文案只决定按钮，不推断表格是否可选择。
 5. 将列标注为 identifier、name、long-text、number、date、status、action 等语义；1366px 画板最多保留 8 个业务列，操作列和状态列计入，自动选择列不计入。
+6. 只从“左侧是否有多选框”解析 `tableSelection`：是=`true`，否或未填写=`false`；不得根据“批量”等按钮文案自动开启选择列。
 
 ### 2. 确认平台与目标位置
 
@@ -136,7 +138,7 @@ pagination / viewport / targetPage / data
 - 页面结构、组合名称、平台外壳和 PageSpec 一致；
 - 导航只有一个当前菜单，仅当前路径祖先展开；自定义一级图标均通过真实 INSTANCE_SWAP 写入并回读成功；
 - 所有可复用设计系统元素仍为真实实例，Slot 和属性关系正确；
-- 筛选显示形式、触发方式、列表操作、选择列、数据状态和分页没有串位；
+- 筛选显示形式、触发方式、列表操作、显式表格选择列、数据状态和分页没有串位；列表操作不会隐式开启 Checkbox；
 - 无文字截断、节点重叠、画板溢出、异常空白、临时截图或占位内容；
 - 组件缺口与运行时假设已记录。
 
