@@ -169,7 +169,8 @@ Filter Bar 可见底边到 List Action Bar 顶边固定为 16px；Data Region �
 
 - 默认展示 5–10 行有差异的虚构或脱敏示例数据；`1366 × 768` 常规结构优先 9 行，空间允许时 10 行。
 - 名称长短有差异，至少覆盖两种状态；长文本至少一条触发省略，不使用真实个人敏感信息。
-- 二元状态使用 Tag：启用为 success，禁用为 danger；精确变体见 `component-map.md`。多状态场景使用 Status Content-V2。
+- 所有表格状态标签都使用组件库真实 `Data Display / Tag / Tag`，不按“二元状态 / 多状态”或具体文案拆分组件。统一使用 `variant=light`、`size=medium`、`shape=square`、`disabled=false`、`Show icon=false`、`Show closeBtn=false`；`theme` 按状态语义选择，例如成功/启用=`success`、失败/禁用=`danger`、等待=`warning`、运行/处理中=`primary`。精确属性见 `component-map.md`。
+- 新列表页不默认使用 Status Content-V2 代替 Tag。只有 PageSpec 明确要求额外状态内容能力，且其内部真实 Tag 仍能完成 `medium/square` 属性写入与回读时才可使用；否则直接使用 Tag，不能交付 `small/round` 的嵌套标签。
 - 默认画面只交付 Data、Loading 或 Empty 中的一种状态，不同时堆叠。
 - Pagination 紧跟最后一行；根据 `pageCount=ceil(total/pageSize)` 选择页数变体。Loading、Empty 或明确无分页时按组合隐藏。
 - 分页可见右边缘必须与 Table Shell 可见右边缘一致；母版 Slot 过宽时使用右侧补偿，不拉伸分页填空。
@@ -213,11 +214,13 @@ Fallback / <capability>
 
 - `compositionName` 与注册表完全一致，筛选栏、展开方式、操作栏、选择列、状态和分页符合组合。
 - 平台、顶部入口、侧栏路径、唯一当前页、祖先激活与展开组符合 PageSpec 和当前平台文件。
+- P0 菜单状态矩阵通过：当前叶子、各级路径祖先和各级未选中菜单的背景、指示条、文字、一级图标与箭头均符合平台规则；swap 后选中一级图标的最终可见颜色为主题色。
 - 页面外壳、Filter Bar、Table Shell 及可复用元素保持真实实例关系；缺口才使用命名明确的页面级 Fallback。
 - Content 为灰色，Page Surface 为白色；12px 外间距、16px 内容边距正确；筛选区到列表操作栏为 16px，列表操作栏到表格为 12px。
 - 标题开关、筛选显示形式、触发方式、查询动作、列表操作、主动作和行操作没有重复或错位。
 - 筛选项宽度属于规定阶梯或小屏 180px 例外，32px 控件及父 Row/Slot 不裁切；小屏优先 4 项一行且剩余空间均分到项间，带标题筛选项的标题到控件为 0px。
-- 表头与数据行列宽一致并连续铺满；选择列数量、危险操作语义、状态文案与 PageSpec 一致；表头选择单元格背景使用 `背景色/--qifu-bg-color-canvas`。
+- 表头与数据行列宽一致并连续铺满；选择列数量、危险操作语义、状态文案与 PageSpec 一致；P0 表头 Header Selection Cell 根节点背景绑定 `背景色/--qifu-bg-color-canvas`，不得是 surface。
+- P0 全量 Tag 检查通过：列表中每个可见 Tag 都是组件库真实 Tag，且实际属性回读为 `medium/square`；不得因文案、二元/多状态分类或 Status-V2 包装而豁免。
 - Table Shell 高度包住表头、全部数据行和分页；分页紧跟数据行且右边缘对齐。
 - 无文字截断、节点重叠、画板溢出、异常空白、placeholder shimmer、临时截图或参考图栅格。
 - 存在缺口时已创建 `Audit / Missing Components`，并且只记录当前页面实际遇到的缺口。

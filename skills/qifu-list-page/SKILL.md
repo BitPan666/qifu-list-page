@@ -138,7 +138,9 @@ pagination / viewport / targetPage / data
 先按 `structural-validation.md` 执行结构化验收；结构状态为 `PASS` 后，再按 `page-rules.md`、`component-map.md` 和当前平台文件逐区截图检查并检查整页。至少确认：
 
 - 页面结构、组合名称、平台外壳和 PageSpec 一致；
-- 导航只有一个当前菜单，仅当前路径祖先展开；自定义一级图标均通过真实 INSTANCE_SWAP 写入并回读成功；
+- P0 菜单状态：导航只有一个当前菜单，仅当前路径祖先展开；逐项核对各级菜单的选中、祖先高亮和未选中样式。自定义一级图标不仅要完成真实 INSTANCE_SWAP 回读，选中祖先或当前项中的可见图标还必须实际呈现主题色，未选中图标必须保持中性色；
+- P0 表格 Tag：列表内所有可见 Tag 不区分文案和状态类型，均使用组件库真实 `Data Display / Tag / Tag`，并回读为 `size=medium`、`shape=square`；
+- P0 表头选择列：显示多选列时，Header Selection Cell 根节点背景必须绑定 `背景色/--qifu-bg-color-canvas`，不得沿用数据行的 surface 背景；
 - 所有可复用设计系统元素仍为真实实例，Slot 和属性关系正确；
 - 筛选显示形式、触发方式、列表操作、显式表格选择列、数据状态和分页没有串位；列表操作不会隐式开启 Checkbox；
 - 无文字截断、节点重叠、画板溢出、异常空白、临时截图或占位内容；

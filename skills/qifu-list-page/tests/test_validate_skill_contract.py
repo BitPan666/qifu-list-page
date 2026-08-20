@@ -181,7 +181,7 @@ class SkillContractValidatorTest(unittest.TestCase):
         component_text = component_map.read_text(encoding="utf-8")
         component_map.write_text(
             component_text.replace(
-                "表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`",
+                "表头 Selection Cell-V2 的根节点 `fills` 必须绑定 `背景色/--qifu-bg-color-canvas`",
                 "",
             ),
             encoding="utf-8",
@@ -191,6 +191,36 @@ class SkillContractValidatorTest(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("--qifu-bg-color-canvas", result.stdout)
+
+    def test_missing_p0_menu_visual_matrix_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        platform_file = copied_root / "references" / "platform-yushu.md"
+        platform_text = platform_file.read_text(encoding="utf-8")
+        platform_file.write_text(
+            platform_text.replace("各级菜单状态视觉矩阵（P0）", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("各级菜单状态视觉矩阵（P0）", result.stdout)
+
+    def test_missing_all_list_tag_contract_is_rejected(self) -> None:
+        temp_dir, copied_root = self.copy_skill()
+        self.addCleanup(temp_dir.cleanup)
+        component_map = copied_root / "references" / "component-map.md"
+        component_text = component_map.read_text(encoding="utf-8")
+        component_map.write_text(
+            component_text.replace("所有列表状态标签：", ""),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator(copied_root)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("所有列表状态标签", result.stdout)
 
     def test_missing_ancestor_selected_state_is_rejected(self) -> None:
         temp_dir, copied_root = self.copy_skill()

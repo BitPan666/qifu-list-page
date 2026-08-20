@@ -27,6 +27,9 @@ REQUIRED_SEMANTICS = {
         "Navigation Text Overlay",
         "tableSelection=true|false",
         "业务提示词首句必须显式调用 `@figma` 插件",
+        "P0 菜单状态",
+        "P0 表格 Tag",
+        "P0 表头选择列",
     ),
     "references/component-invocation-contract.md": (
         "componentProperties",
@@ -44,13 +47,18 @@ REQUIRED_SEMANTICS = {
         "sidePath 只控制左侧菜单",
     ),
     "references/component-map.md": (
-        "表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`",
+        "表头 Selection Cell-V2 的根节点 `fills` 必须绑定 `背景色/--qifu-bg-color-canvas`",
+        "所有列表状态标签：",
+        "size=medium",
+        "shape=square",
     ),
     "references/platform-yushu.md": (
         "navigationMode=yushuPreset|custom",
         "Icon/<system>/<purpose>",
         "只有当前路径祖先可以进入 `sideExpanded`",
         "所有祖先都使用 `State=Selected`",
+        "各级菜单状态视觉矩阵（P0）",
+        "图标仍为黑色或其他中性色时本项判 `FAIL`",
     ),
     "references/structural-validation.md": (
         "ComponentResolutionManifest",
@@ -58,6 +66,9 @@ REQUIRED_SEMANTICS = {
         "Filter Item-V2 实例数等于 `filters[]` 数量",
         "Navigation Text Overlay",
         "structuralValidation PASS|BLOCKED|FAIL",
+        "## 2. P0 重点检查项",
+        "全量 Tag 样式",
+        "Header Selection Cell 根节点",
     ),
 }
 

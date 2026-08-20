@@ -91,13 +91,13 @@ Input V2 的 `M 默认尺寸` 已是原生 32px：16px 图标垂直居中于 y=8
 | 数据行 V2 | `Data Display / Table / Row-V2` | `3393:6352` | `664e352544bee819c99b4de41284c9ac9d5d9901` | `cellsSlot`、`size`、`background`、`divider` |
 | 选择单元格 V2 | `Data Display / Table / Selection Cell-V2` | `3418:34040` | `98d12bfe7f1002a9ded85775369e6f76b2a3531a` | 固定 48px，嵌套并暴露 Checkbox；`size`、`background`、`divider` |
 | 文本内容 V2 | `Data Display / Table / Cell Content / Text-V2` | `3368:6025` | `51d09b477c04116ed5d16e1a19a0d1a926dae49f` | `value`、`contentFont=14px/12px` |
-| 状态内容 V2 | `Data Display / Table / Cell Content / Status-V2` | `3491:8894` | `d903d3fb91e052ff713beafe22e72e39d3594fcb` | 用于 pending/error/processing 等多状态；二元启用/禁用改用下方 Tag 精确语义映射 |
+| 状态内容 V2 | `Data Display / Table / Cell Content / Status-V2` | `3491:8894` | `d903d3fb91e052ff713beafe22e72e39d3594fcb` | 仅兼容明确要求额外状态内容能力的页面；新列表页所有普通状态标签统一使用下方 Tag。若使用本组件，其内部真实 Tag 也必须可写并回读为 `medium/square`，否则判 `FAIL` |
 | 操作内容 V2 | `Data Display / Table / Cell Content / Action Content-V2` | `3678:8875` | `eb3a6d86f44bbb9f4e811e23300898c3f9259deb` | `action1..4`、`showAction2..4`；`dangerAction=None/Action1/Action2/Action3/Action4`，支持 1–4 个紧凑操作且最多标记一个危险项 |
 | 表头单元格 | `Data Display / Table / Header Cell` | `3234:7927` | `af0a8d220aa801d708a6eb5a5cec58686d3d1209` | `label`、sort/filter/asc/desc、`size`、`headerFont`、`divider` |
 | 内容单元格 | `Data Display / Table / Content Cell` | `3234:8027` | `55ee73644b95fd0a20408a85eeefba5df69fa3ea` | `value`、`size`、`contentFont`、`background`、`divider`、`content=text/action` |
 | 表格列 | `Data Display / Table / Column` | `3234:8271` | `3cc97b002d72777c8e0986fa80cd6f08859df023` | `type=basic/bordered/stripe`、`size`、`contentFont`、`content` |
 | 固定整表 | `Data Display / Table / Table` | `3234:8525` | `f35bf5473bb6138c813aaac0cd1abb68b2ce0f21` | `type`、`size`、`contentFont` |
-| 标签 | `Data Display / Tag / Tag` | `3178:9659` | `a804e46f1544bd11fe932da5a86f04ea18d65bda` | 二元状态：启用=`light/success/medium/square`、禁用=`light/danger/medium/square`；两者 `disabled=false`、icon=false、close=false，文案分别为启用/禁用 |
+| 标签 | `Data Display / Tag / Tag` | `3178:9659` | `a804e46f1544bd11fe932da5a86f04ea18d65bda` | 所有列表状态标签：`variant=light`、`size=medium`、`shape=square`、`disabled=false`、icon=false、close=false；`theme` 按语义映射，成功/启用=`success`、失败/禁用=`danger`、等待=`warning`、运行/处理中=`primary`。规则适用于所有文案和状态数量，不仅限启用/禁用 |
 | 空状态 | `Data Display / Empty / Empty` | `3447:134` | `4f33759f3944920ed616a87abb0cb67ed82aa4e1` | `status=NoData/NoResult/Network/NoPermission/Failed`、`size=S/M/L`、title/description 文本、描述/操作布尔属性 |
 | 分页 V2 | `Navigation / Pagination / Pagination-V2` | `3698:482` | `57f5f847efd41f61f15c32aed8b2d4a48885f871` | `size=medium/small`；`pageCount=1/2/3/4/5/6+`；`showTotal`、`showPageSize`、`showJumper`；`total`、`current`、`pageSize`、`jump`、`endPage`、`jumpTotal` |
 | 分页（旧版） | `Navigation / Pagination / Pagination` | `2597:2086` | `30f50ef8e07569627f467a7f9e025bdc896dcf77` | 保留完整 default/simple 与 32 个旧组合变体，仅兼容旧页面 |
@@ -122,7 +122,7 @@ Table Shell-V2 的 `size`、`type`、`selection` 只决定母版默认 Slot 内�
 同步顺序：
 
 1. 设置 Table Shell V2 的 `size/type/selection`。
-2. 替换 `headerSlot` 后，遍历全部 Header Cell-V2，并按同一个 `TableStyleSpec` 设置 `size/divider`；若显示选择列，表头选择单元格背景必须绑定 `背景色/--qifu-bg-color-canvas`，与其他表头单元格保持同色，不得沿用数据行的 surface 背景。
+2. 替换 `headerSlot` 后，遍历全部 Header Cell-V2，并按同一个 `TableStyleSpec` 设置 `size/divider`；若显示选择列，表头 Selection Cell-V2 的根节点 `fills` 必须绑定 `背景色/--qifu-bg-color-canvas`，与其他表头单元格保持同色，不得沿用数据行的 surface 背景。这里只检查 Selection Cell 根背景，不把嵌套 Checkbox 方框自身的填充误判为表头背景。
 3. 替换 `rowsSlot` 后，先设置每个 Row-V2，再遍历该行全部 Content Cell-V2；斑马纹背景必须同时写到 Row、Content Cell 和 Selection Cell-V2。
 4. 按 `selection` 显式插入或移除选择单元格，不依赖 Shell 自动增删。
 5. 独立配置 `paginationSlot`。Pagination-V2 不继承表格的 `size/type/selection`；先计算 `pageCount=ceil(total/pageSize)`，选择对应页数变体，再设置 `size`、三个区域布尔属性和文案属性。
@@ -146,8 +146,8 @@ Table Shell-V2 的 `size`、`type`、`selection` 只决定母版默认 Slot 内�
    - 普通 Tabs 或 closable Tag 只能作为临时降级。
 
 3. **Status / 紧凑状态点**
-   - Status Content V2 已覆盖五种常用 Tag 状态，但尚缺 `dot + text` 表现。
-   - 需要 default/success/warning/error/disabled 语义与自定义文案；补齐前仅在页面级克制降级。
+   - Status Content V2 内含五种 Tag 状态，但不作为新列表页普通状态标签的默认入口；普通状态仍直接使用 `Data Display / Tag / Tag` 并遵循全量 `medium/square` 契约。
+   - 当前尚缺 `dot + text` 表现。需要 default/success/warning/error/disabled 语义与自定义文案；补齐前仅在 PageSpec 明确要求该额外能力时使用受限降级。
 
 4. **页面外壳响应式宽度**
    - List Page Shell V2 与 Table Shell V2 的默认内容宽度为 1248px；选择列开关已不会导致跳宽。

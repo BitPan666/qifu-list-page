@@ -51,8 +51,8 @@ Component Map 中的 `Label`、`text`、`value 文本` 等是逻辑名称。Figm
 | `tableSelection=false` 或未填写 | Table Shell-V2 `selection=off`，不插入 Selection Cell-V2；列表操作按钮不改变此结果 |
 | `columns[]` | 每列 1 个 Header Cell-V2；每行每列 1 个 Content Cell-V2 |
 | 普通文本列 | Content Cell-V2 内放 Text-V2 |
-| 启用/禁用二元状态 | Content Cell-V2 内放 Tag |
-| pending/error/processing 等多状态 | Content Cell-V2 内放 Status-V2 |
+| 所有标签型状态，不区分文案、二元或多状态 | Content Cell-V2 内放真实 Tag，并统一写入 `medium/square`；主题按状态语义映射 |
+| PageSpec 明确要求 Status-V2 的额外状态内容能力 | 仅当其内部真实 Tag 也可写并回读为 `medium/square` 时使用；否则使用 Tag 或按失败关闭 |
 | `rowActions[]` | Content Cell-V2 内放 Action Content-V2 |
 | `pagination` | Table Shell-V2 的 paginationSlot 放 Pagination-V2 |
 
@@ -182,10 +182,10 @@ INSTANCE_SWAP 的目标必须是已解析的真实 ComponentNode：
 | Text-V2 | 文案 | `value` | TEXT | 文本格必需 |
 | Action Content-V2 | 动作文案 | `action1`…`action4` | TEXT | 按动作数必需 |
 | Action Content-V2 | 动作开关 | `showAction2`…`showAction4` | BOOLEAN | 按动作数必需 |
-| Tag | 类型/主题/尺寸/形状 | `variant` / `theme` / `size` / `shape` | VARIANT | 二元状态必需 |
-| Tag | 禁用 | `disabled` | BOOLEAN | 二元状态必需 |
-| Tag | 文案 | `text` | TEXT | 二元状态必需 |
-| Tag | 图标/关闭 | `Show icon` / `Show closeBtn` | BOOLEAN | 二元状态必需 |
+| Tag | 类型/主题/尺寸/形状 | `variant` / `theme` / `size` / `shape` | VARIANT | 每个列表标签必需；`variant=light`、`size=medium`、`shape=square` |
+| Tag | 禁用 | `disabled` | BOOLEAN | 每个列表标签必需；固定为 `false` |
+| Tag | 文案 | `text` | TEXT | 每个列表标签必需 |
+| Tag | 图标/关闭 | `Show icon` / `Show closeBtn` | BOOLEAN | 每个列表标签必需；均固定为 `false` |
 | Pagination-V2 | 页数档位 | `pageCount` | VARIANT | 分页必需 |
 | Pagination-V2 | 总数/每页/跳页 | `showTotal` / `showPageSize` / `showJumper` | BOOLEAN | 分页必需 |
 
