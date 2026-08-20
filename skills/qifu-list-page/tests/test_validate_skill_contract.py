@@ -209,9 +209,34 @@ class SkillContractValidatorTest(unittest.TestCase):
 
     def test_readme_prompt_exposes_table_selection_toggle(self) -> None:
         readme_text = README.read_text(encoding="utf-8")
+        example_text = readme_text.split("## 提示词示例", 1)[1].split("## 更新", 1)[0]
 
         self.assertIn("左侧是否有多选框：【是 / 否，不填默认否】", readme_text)
-        self.assertIn("左侧是否有多选框：否", readme_text)
+        self.assertIn("表格左侧是否有多选框：是。", example_text)
+
+    def test_readme_prompt_example_uses_data_quality_alert_records_scenario(self) -> None:
+        readme_text = README.read_text(encoding="utf-8")
+        example_text = readme_text.split("## 提示词示例", 1)[1].split("## 更新", 1)[0]
+
+        required_business_inputs = (
+            "生成“数据质量告警记录列表页”",
+            "页面标题：显示“数据质量告警记录”",
+            "当前菜单路径：风险监控 > 数据质量监控 > 告警记录",
+            "筛选字段：告警名称、所属项目、告警级别、处置状态、发生时间",
+            "左侧“批量确认、批量关闭”",
+            "主操作：“新建质量规则”，位置：列表最右侧",
+            "表格列：告警名称、所属项目、告警级别、负责人、处置状态、发生时间、操作",
+            "行操作：查看、立即处理、关闭",
+            "告警级别：提示、一般、严重",
+            "处置状态：待处理、处理中、已解决、已关闭",
+            "示例数据：8条；分页：总数126、每页20条；画板尺寸：1366×768",
+            "当前菜单路径只用于生成和选中左侧菜单层级，不在内容区域生成面包屑",
+        )
+        for business_input in required_business_inputs:
+            self.assertIn(business_input, example_text)
+
+        self.assertNotIn("medium/square", example_text)
+        self.assertNotIn("Tag / Tag", example_text)
 
     def test_missing_figma_plugin_prompt_contract_is_rejected(self) -> None:
         temp_dir, copied_root = self.copy_skill()
@@ -236,7 +261,7 @@ class SkillContractValidatorTest(unittest.TestCase):
             readme_text,
         )
         self.assertIn(
-            "使用 qifu-list-page Skill，并调用 @figma 插件，在【Figma 地址】的“测试”Page 生成“质检规则版本列表页”。",
+            "使用 qifu-list-page Skill，并调用 @figma 插件，在【https://www.figma.com/design/gTV3VdC6a5e9vpkRHIZSXA/奇富科技中后台组件库-新?node-id=3497-651】的“测试”Page 生成“数据质量告警记录列表页”。",
             readme_text,
         )
         self.assertNotIn("app://connector_", readme_text)
